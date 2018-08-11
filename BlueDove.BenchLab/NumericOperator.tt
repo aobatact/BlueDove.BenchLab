@@ -1,0 +1,63 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#   var smallnumericnames = new string[]{"sbyte","byte","short","ushort"};
+	 var numericnames = new string[]{"sbyte","byte","short","ushort","int","uint","long","ulong","float","double","decimal","Complex","BigInteger"};
+	 var operatortuples = new (string,string)[]{("Add","+"),("Subtract","-"),("Multiply","*"),("Divide","/")};
+	 var unaryes = new (string,string)[]{("UnaryPlus","+"),("UnaryMinus","-")};
+	 var structvsclass = new (string,string)[]{("sealed class NumericOperator_",""),("struct NumericOperatorS_","I"), ("sealed class InNumericOperator_","In"),("struct InNumericOperatorS_","IIn")};#>
+using System;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+namespace BlueDove.BenchLab
+{
+<#
+ int i = 0;
+ foreach (var sorc in structvsclass){
+ foreach (var numericname in numericnames) { 
+ var small = smallnumericnames.Contains(numericname);
+ #>
+	public <#= sorc.Item1 + numericname #> : <#= sorc.Item2 #>NumericOperator<<#= numericname #>>
+	{
+<# foreach (var operatortuple in operatortuples) { #>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public <#= (i &  1) == 1 ? "" : "sealed override" #> <#= numericname #> <#= operatortuple.Item1 #>(<#= i> 1 ? "in" : "" #> <#= numericname #> left,<#= i> 1 ? "in" : "" #> <#= numericname #> right)
+			=> <#= small ? "(" + numericname + ")(" : "" #> left <#= operatortuple.Item2 #> right<#= small ? ")" : "" #>;
+<# } foreach (var unary in unaryes){ #>
+		public <#= (i &  1) == 1 ? "" : "sealed override" #> <#= numericname #> <#= unary.Item1 #>(<#= i> 1 ? "in" : "" #> <#= numericname #> value)
+<# if((unary.Item1 == "UnaryMinus" && (numericname == "uint"||numericname == "ulong"))||(unary.Item1 == "UnaryPlus" && (numericname == "Complex")) ) { #>
+			=> throw new NotSupportedException();
+<#  }else{ #>
+			=> <#= small ? "(" + numericname + ")" : "" #><#= unary.Item2 #>value;
+<# }} #>
+		//public <#= (i &  1) == 1 ? "" : "sealed override" #> <#= numericname #> Zero{ get; } = 0;
+		//public <#= (i &  1) == 1 ? "" : "sealed override" #> <#= numericname #> One{ get; } = 1;
+	}
+<# } i++;
+} #>
+    internal static class NumericOperatorHelper
+    {
+        public static object CreateDefualtOperator(Type type)
+        {
+<# foreach (var numericname in numericnames) { #>
+			if(type == typeof(<#= numericname #>))
+				return new NumericOperator_<#= numericname #>();
+			else
+<# } #>
+				throw new NotSupportedException();
+        }
+
+		public static object CreateInDefualtOperator(Type type)
+        {
+<# foreach (var numericname in numericnames) { #>
+			if(type == typeof(<#= numericname #>))
+				return new InNumericOperator_<#= numericname #>();
+			else
+<# } #>
+				throw new NotSupportedException();
+        }
+    }
+}
