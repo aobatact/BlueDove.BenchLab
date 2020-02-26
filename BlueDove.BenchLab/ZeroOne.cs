@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Exporters;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace BlueDove.BenchLab
 {
@@ -8,6 +8,7 @@ namespace BlueDove.BenchLab
     public class ZeroOne
     {
         int i;
+        ulong ifull;
         [Params(true,false)]
         public bool b;
         double d;
@@ -19,6 +20,7 @@ namespace BlueDove.BenchLab
         public void SetUp()
         {
             d = i = b ? 1 : 0;
+            ifull = b ? ulong.MaxValue : 0; 
             var ran = new Random();
             value = ran.NextDouble();
         }
@@ -31,5 +33,13 @@ namespace BlueDove.BenchLab
 
         [Benchmark]
         public void Double() => res = value * d;
+        
+        [Benchmark]
+        public void IntAnd()
+        {
+            var dint = Unsafe.As<double, ulong>(ref d);
+            dint &= ifull;
+            res = Unsafe.As<ulong, double>(ref dint);
+        }
     }
 }

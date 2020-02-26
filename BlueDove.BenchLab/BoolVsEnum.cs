@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace BlueDove.BenchLab
 {
@@ -69,6 +69,12 @@ namespace BlueDove.BenchLab
                 }
             }
         }
+        
+        [Benchmark]
+        public void SmarterBool()
+        {
+            Func(a0 ? a1 ? 1 : 0 : a1 ? 3 : 2);
+        }
 
         [Benchmark]
         public void Byte()
@@ -93,6 +99,21 @@ namespace BlueDove.BenchLab
         }
 
         [Benchmark]
+        public void ByteAsBool()
+        {
+            var f1 = (byte) (v >> 1);
+            ref var b1 = ref Unsafe.As<byte,bool>(ref f1);
+            if (Unsafe.As<byte,bool>(ref v))
+            {
+                Func(b1 ? 1 : 0);
+            }
+            else
+            {
+                Func(b1 ? 3 : 2);
+            }
+        }
+        
+        [Benchmark]
         public void IntEnum()
         {
             switch (ienum)
@@ -111,6 +132,29 @@ namespace BlueDove.BenchLab
                     return;
                 default:
                     throw new Exception();
+            }
+        }
+        
+        [Benchmark]
+        public void IntEnumThrower()
+        {
+            switch (ienum)
+            {
+                case Ienum.i0:
+                    Func(0);
+                    return;
+                case Ienum.i1:
+                    Func(1);
+                    return;
+                case Ienum.i2:
+                    Func(2);
+                    return;
+                case Ienum.i3:
+                    Func(3);
+                    return;
+                default:
+                    Thrower();
+                    return;
             }
         }
 
@@ -136,6 +180,33 @@ namespace BlueDove.BenchLab
             }
         }
 
+        [Benchmark]
+        public void ByteEnumThrower()
+        {
+            switch (benum)
+            {
+                case Benum.b0:
+                    Func(0);
+                    return;
+                case Benum.b1:
+                    Func(1);
+                    return;
+                case Benum.b2:
+                    Func(2);
+                    return;
+                case Benum.b3:
+                    Func(3);
+                    return;
+                default:
+                    Thrower();
+                    return;
+            }
+        }
+
+        
+        private void Thrower()
+            => throw new Exception();
+        
     }
 
 

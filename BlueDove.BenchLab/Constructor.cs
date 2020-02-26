@@ -1,7 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Jobs;
-using BenchmarkDotNet.Jobs;
+
 namespace BlueDove.BenchLab
 {
     [ShortRunJob]

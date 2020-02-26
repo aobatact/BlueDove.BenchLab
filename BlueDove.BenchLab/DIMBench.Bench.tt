@@ -1,0 +1,97 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+using System;
+using BenchmarkDotNet.Attributes;
+
+namespace BlueDove.BenchLab
+{
+<# 
+var opNames = new string[]{"Add"};
+var opImpls = new string[]{" => x + y;"};
+for (var opNum = 0; opNum < opNames.Length; opNum++) 
+{
+    var opName = opNames[opNum];
+#>
+    public class DIMBench<#= opName #>
+	{
+		interface INonDim
+		{
+			int <#= opName #>(int x, int y);
+		}
+
+		interface IDim
+		{
+			int <#= opName #>(int x, int y);
+			int <#= opName #>Dim(int x, int y)<#= opImpls[opNum]#>
+		}
+
+		interface IOverridedDim : IDim
+        {
+            abstract int IDim.<#= opName #>Dim(int x, int y);
+        }
+
+		static int NonDim<#= opName #><T>(T ins, int x, int y) where T : INonDim => ins.<#= opName #>(x, y);
+		static int DimNonDim<#= opName #><T>(T ins, int x, int y) where T : IDim => ins.<#= opName #>(x, y);
+		static int DimDim<#= opName #><T>(T ins, int x, int y) where T : IDim => ins.<#= opName #>Dim(x, y);
+
+		int x;
+		int y;
+		int res;
+<#
+var list = new List<string>();
+for(var y = 0; y < 3; y++)
+{ 
+    var dimStr = y == 0 ? "NonDim" : y == 1 ? "Dim" : "DimOverride";
+    var inf = y == 0 ? "INonDim" : "IDim";
+    for (var x = 0; x < 2; x++)
+    { 
+        var coSStr = x == 0 ? "class" : "struct"; 
+        var typeName = dimStr + coSStr; list.Add(typeName);
+#>
+		<#= coSStr #> <#= typeName #> : <#= inf #>
+		{
+			public int <#= opName #>(int x, int y)<#= opImpls[opNum]#>
+<# if(y == 2){#>
+			public int <#= opName #>Dim(int x, int y)<#= opImpls[opNum]#>
+<# }#>
+		}
+		
+		<#= typeName #> <#= typeName #>_Instance;
+
+		[Benchmark]
+		public void <#= typeName #>_NonDim<#= opName #>()
+		{
+<#if(y==0){#>
+			res = NonDim<#= opName #>(<#= typeName #>_Instance, x, y);
+<#}else{#>
+			res = DimNonDim<#= opName #>(<#= typeName #>_Instance, x, y);
+<#}#>
+		}
+
+<#if(y!=0){#>
+		[Benchmark]
+		public void <#= typeName #>_Dim<#= opName #>()
+		{
+			res = DimDim<#= opName #>(<#= typeName #>_Instance, x, y);
+		}
+<#}#>
+
+<# }} #>
+
+		[GlobalSetup]
+		public void SetUp()
+		{
+			var random = new Random();
+			x = random.Next();
+			y = random.Next();
+<#foreach(var t in list){#>
+			<#= t #>_Instance = new <#= t #>();
+<#}#>
+		}
+	}
+<#}#>
+}

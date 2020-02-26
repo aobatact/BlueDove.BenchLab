@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;

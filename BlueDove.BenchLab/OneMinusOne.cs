@@ -10,7 +10,7 @@ namespace BlueDove.BenchLab
         public bool b;
         double d;
 
-        double value;
+        double _value;
         public double res;
 
         [GlobalSetup]
@@ -18,16 +18,16 @@ namespace BlueDove.BenchLab
         {
             d = i = b ? 1 : -1;
             var ran = new Random();
-            value = ran.NextDouble();
+            _value = ran.NextDouble();
         }
 
         [Benchmark]
-        public void Bool() => res = b ? value : -value;
+        public void Bool() => res = b ? _value : -_value;
 
         [Benchmark]
-        public void Int() => res = value * i;
+        public void Int() => res = _value * i;
 
         [Benchmark]
-        public void Double() => res = value * d;
+        public void Double() => res = _value * d;
     }
 }

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8</LangVersion>
     <Platforms>AnyCPU;x64;x86</Platforms>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -31,7 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.10.14" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0-preview.18571.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +40,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="DIMBench.Bench.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DIMBench.Bench.tt</DependentUpon>
+    </Compile>
     <Compile Update="NumericOperator.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -50,6 +56,10 @@
     <None Update="Constructor.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Constructor.cs</LastGenOutput>
+    </None>
+    <None Update="DIMBench.Bench.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DIMBench.Bench.cs</LastGenOutput>
     </None>
     <None Update="NumericOperator.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
