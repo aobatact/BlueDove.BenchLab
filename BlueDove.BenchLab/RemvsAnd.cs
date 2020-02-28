@@ -1,5 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace BlueDove.BenchLab
 {
@@ -7,8 +10,10 @@ namespace BlueDove.BenchLab
     public class RemvsAnd
     {
         int v;
-        [Params(2,4,8,16)]
+
+        [Params(2, 4, 8, 16)]
         public int bitcount;
+
         public int h;
         int rem;
         int and;
@@ -29,19 +34,11 @@ namespace BlueDove.BenchLab
         }
 
         [Benchmark]
-        public void Rem()
-        {
-            h = v % rem; 
-        }
+        public void Rem() { h = v % rem; }
 
         [Benchmark]
-        public void And()
-        {
-            h = v & and;
-        }
+        public void And() { h = v & and; }
     }
-
-
 
     public class RemvsAnd32
     {
@@ -59,16 +56,9 @@ namespace BlueDove.BenchLab
         }
 
         [Benchmark]
-        public void Rem()
-        {
-            h = v % rem;
-        }
+        public void Rem() { h = v % rem; }
 
         [Benchmark]
-        public void And()
-        {
-            h = v & and;
-        }
+        public void And() { h = v & and; }
     }
-
 }

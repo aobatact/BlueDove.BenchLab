@@ -5,47 +5,66 @@ namespace BlueDove.BenchLab
 {
     public class Increment
     {
-        [Params(10000)]
-        public int count;
+        [Params(100)]
+        public int Count;
 
-        byte[] values;
-
-        byte[] xval;
-
+        private int[] values;
+        private int zero = 0;
+        private Random _random;
+        
         [GlobalSetup]
         public void SetUp()
         {
-            values = new byte[count];
-            xval = new byte[count];
-            (new Random()).NextBytes(values);
+            values = new int[Count];
+            _random = new Random();
         }
-
+        
         [Benchmark]
-        public void Post()
+        public void Before()
         {
-            int j = 0;
-            for (int i = 0; i < count; i++)
+            var c = 0;
+            while (c < Count)
             {
-                xval[j++] = values[i];
+                values[c++] = _random.Next();
+            }
+        }
+        
+        [Benchmark]
+        public void After()
+        {
+            var c = -1;
+            while (++c < Count)
+            {
+                values[c] = _random.Next();
+            }
+        }        
+        
+        [Benchmark]
+        public void AfterS()
+        {
+            var c = -1;
+            var co = Count - 1;
+            while (c < co)
+            {
+                values[++c] = _random.Next();
             }
         }
 
         [Benchmark]
-        public void Pre()
+        public void ForC()
         {
-            int j = -1;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < Count; i++)
             {
-                xval[++j] = values[i];
+                values[i] = _random.Next();
             }
         }
 
         [Benchmark]
         public void For()
         {
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < values.Length; i++)
             {
-                xval[i] = values[i];
+                values[i] = _random.Next();
             }
         }
     }

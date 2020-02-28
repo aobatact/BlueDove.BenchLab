@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "BlueDove.BenchLab": {
-      "commandName": "Project",
-      "workingDirectory": "G:\\aobat\\Document\\Projects\\BlueDove.BenchLab\\BlueDove.BenchLab\\BenchmarkDotNet.Artifacts"
-    }
-  }
-}
